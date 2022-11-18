@@ -1,7 +1,7 @@
 <?php 
 session_start();
-$name = $emai= $password = "";
-$name_error = $email_error = $password_error = "";
+$name = $emai= $password = $image="";
+$name_error = $email_error = $password_error =$image_error= "";
 
 //cleanup function
 function cleanup(string $data){
@@ -27,6 +27,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     $email = cleanup($_POST['email']);
     $password = cleanup($_POST['password']);
 
+    print_r($_FILES);
+
     checkEmpty($name, $name_error);
     checkEmpty($email, $email_error);
     checkEmpty($password, $password_error);
@@ -36,6 +38,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 }
 if (!empty($password) && strlen($password) <6){
     $password_error = "Password cannot be less than 6 characters";
+}
+if (empty($password_error) && empty($email_error) && empty($name_error)){
+    $_SESSION['name'] = $name;
+    $_SESSION['email'] = $email;
+    $_SESSION['password'] = $password;
+
+    //redirect to succes.php
+    header('location: success.php');
 }
 }
 
@@ -51,7 +61,7 @@ if (!empty($password) && strlen($password) <6){
     <title>Document</title>
 </head>
 <body>
-    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
         <label for="name">Name</label><br>
         <input type="text" name="name" id="name" value="<?php echo $name ?>">
         <?php echo isset($name_error) && !empty($name_error) ? displayError($name_error): ''; ?>
@@ -65,6 +75,10 @@ if (!empty($password) && strlen($password) <6){
         <label for="password">Password</label><br>
         <input type="password" name="password" id="password">
         <?php echo isset($password_error) && !empty($password_error) ? displayError($password_error): ''; ?>
+        <br>
+        <br>
+        <label for="image">Upload Profile pic</label><br>
+        <input type="file" name="image" id="image">
         <br>
         <br>
         <input type="submit" value="Register">
