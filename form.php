@@ -10,6 +10,17 @@ function cleanup(string $data){
     $data = htmlspecialchars($data);
     return $data;
 }
+function uploadFile($file){
+    //if(isset($_FILES['image'])){
+        $target_dir = 'uploads/';
+        $target_file = $target_dir .rand(). basename($file['name']);
+        $file_extension = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        move_uploaded_file($file['tmp_name'], $target_file);
+    // }else{
+    //     $image_error = "the image is required";
+    // }
+}
+
 
 function checkEmpty($data, &$error_str){
     if (empty($data)){
@@ -27,7 +38,13 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     $email = cleanup($_POST['email']);
     $password = cleanup($_POST['password']);
 
-    print_r($_FILES);
+    if(isset($_FILES['image'])){
+        uploadFile($_FILES['image']);
+    }else {
+        $image_error = "the image is required";
+    }
+
+    
 
     checkEmpty($name, $name_error);
     checkEmpty($email, $email_error);
