@@ -1,6 +1,6 @@
 <?php 
 session_start();
-$name = $emai= $password = $image="";
+$name = $email= $password = $image="";
 $name_error = $email_error = $password_error =$image_error= "";
 
 //cleanup function
@@ -20,7 +20,7 @@ function uploadFile($file, $allowed_types=[], &$error_message ='' ){
     // }else{
     //     $image_error = "the image is required";
     // }
-    if (empty($allowed_types) < 1 || in_array($file_extension, $allowed_types)){
+    if (count($allowed_types) < 1 || in_array($file_extension, $allowed_types)){
         move_uploaded_file($file['tmp_name'], $target_file);
         
     }else{
@@ -58,13 +58,18 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 if (!empty($password) && strlen($password) <6){
     $password_error = "Password cannot be less than 6 characters";
 }
+$allChecks = empty($password_error) && empty($email_error) && empty($name_error);
 
-if(isset($_FILES['image']['name'])){
+if(isset($_FILES['image']['name']) && !empty($_FILES['image']['name'])){
+    if($allChecks){
+
+    
     uploadFile($_FILES['image'], ['png', 'jpg', 'jpeg', 'gif'], $image_error);
-}else {
-    $image_error = "the image is required";
 }
-if (empty($password_error) && empty($email_error) && empty($name_error) && empty($image_error)){
+}else {
+    $image_error = " image is required";
+}
+if ($allChecks && empty($image_error)){
 
    
 
