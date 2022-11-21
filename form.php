@@ -10,15 +10,22 @@ function cleanup(string $data){
     $data = htmlspecialchars($data);
     return $data;
 }
-function uploadFile($file){
+//functio unpload file
+function uploadFile($file, $allowed_types=[], &$error_message ='' ){
     //if(isset($_FILES['image'])){
         $target_dir = 'uploads/';
         $target_file = $target_dir .rand(). basename($file['name']);
         $file_extension = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-        move_uploaded_file($file['tmp_name'], $target_file);
+       // move_uploaded_file($file['tmp_name'], $target_file);
     // }else{
     //     $image_error = "the image is required";
     // }
+    if (empty($allowed_types) < 1 || in_array($file_extension, $allowed_types)){
+        move_uploaded_file($file['tmp_name'], $target_file);
+        
+    }else{
+        $error_message = "we only allow ". implode(',', $allowed_types);
+    }
 }
 
 
@@ -38,12 +45,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     $email = cleanup($_POST['email']);
     $password = cleanup($_POST['password']);
 
-    if(isset($_FILES['image'])){
-        uploadFile($_FILES['image']);
-    }else {
-        $image_error = "the image is required";
-    }
-
+    
     
 
     checkEmpty($name, $name_error);
@@ -56,7 +58,17 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 if (!empty($password) && strlen($password) <6){
     $password_error = "Password cannot be less than 6 characters";
 }
-if (empty($password_error) && empty($email_error) && empty($name_error)){
+
+if(isset($_FILES['image']['name'])){
+    uploadFile($_FILES['image'], ['png', 'jpg', 'jpeg', 'gif'], $image_error);
+}else {
+    $image_error = "the image is required";
+}
+if (empty($password_error) && empty($email_error) && empty($name_error) && empty($image_error)){
+
+   
+
+
     $_SESSION['name'] = $name;
     $_SESSION['email'] = $email;
     $_SESSION['password'] = $password;
@@ -96,6 +108,7 @@ if (empty($password_error) && empty($email_error) && empty($name_error)){
         <br>
         <label for="image">Upload Profile pic</label><br>
         <input type="file" name="image" id="image">
+        <?php echo isset($image_error) && !empty($image_error) ? displayError($image_error): ''; ?>
         <br>
         <br>
         <input type="submit" value="Register">
