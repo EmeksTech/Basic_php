@@ -22,6 +22,8 @@ echo $volvo->get_name();
 echo "<br>";
 echo $volvo->get_color();
 
-
-
-?>
+echo "<br>";
+$toyota = new Car('Toyota', 'Blue');
+echo $toyota->get_name();
+echo "<br>";
+echo $toyota->get_color();
